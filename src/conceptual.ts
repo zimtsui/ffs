@@ -2,7 +2,6 @@ import assert = require('assert');
 import {
     RegularFileFnodeContent, DirectoryFnodeContentItem,
     FnodeId, PathIterator,
-    // isRegularFileContent,
     FnodeView,
 } from './interfaces';
 import _ = require('lodash');
