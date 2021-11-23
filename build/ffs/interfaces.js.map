@@ -1,1 +1,0 @@
-{"version":3,"file":"interfaces.js","sourceRoot":"","sources":["../../src/ffs/interfaces.ts"],"names":[],"mappings":";;;AAgCA,SAAgB,oBAAoB,CAAC,WAAwB;IAEzD,OAAO,WAAW,YAAY,MAAM,CAAC;AACzC,CAAC;AAHD,oDAGC;AAuBD,SAAgB,wBAAwB,CAAC,eAAyB;IAE9D,OAAO,eAAe,YAAY,MAAM,CAAC;AAC7C,CAAC;AAHD,4DAGC;AASD,MAAM,CAAC,SAAS,CAAC,MAAM,GAAG,cAAc,OAAO,IAAI,CAAC,QAAQ,EAAE,CAAA,CAAC,CAAC,CAAA"}

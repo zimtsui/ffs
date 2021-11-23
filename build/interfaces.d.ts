@@ -1,38 +1,48 @@
 /// <reference types="node" />
-export declare type RegularFileContent = Buffer;
-export declare type DirectoryContent = {
-    id: FileId;
-    name: string;
-    ctime: number;
-}[];
-export declare type DirectoryContentDetails = {
-    name: string;
-    type: FileType;
-    ctime: number;
-    mtime: number;
-}[];
-export declare type FileType = '-' | 'd';
-export declare type FileId = bigint;
-export declare type BranchId = number;
-export declare type UserId = number;
+export declare type FnodeType = '-' | 'd';
+export declare type FnodeId = bigint;
 export declare type PathIterator = Iterator<string>;
-export interface FileMetadata {
-    type: '-' | 'd';
+interface FnodeGenericMetadata {
+    id: FnodeId;
     mtime: number;
-    rtime: number;
-    previousVersionId: FileId;
-    firstVersionId: FileId;
+    rmtime: number;
+    previousVersionId: FnodeId;
+    firstVersionId: FnodeId;
 }
-export interface UserProfile {
-    id: number;
+export interface RegularFileFnodeMetadata extends FnodeGenericMetadata {
+    type: '-';
+}
+export interface DirectoryFnodeMetadata extends FnodeGenericMetadata {
+    type: 'd';
+}
+export declare type FnodeMetadata = RegularFileFnodeMetadata | DirectoryFnodeMetadata;
+export declare type RegularFileFnodeContent = Buffer;
+export interface DirectoryFnodeContentItem {
+    id: FnodeId;
     name: string;
-    password: string;
+    btime: number;
 }
-export declare type SubscriptionsView = {
-    branchId: number;
-    branchName: string;
-    latestVersionId: FileId;
-}[];
-export interface AuthState {
-    user: number;
+export declare type DirectoryFnodeContent = DirectoryFnodeContentItem[];
+export declare type FnodeContent = RegularFileFnodeContent | DirectoryFnodeContent;
+export interface RegularFileFnode extends RegularFileFnodeMetadata {
+    content: RegularFileFnodeContent;
 }
+export interface DirectoryFnode extends DirectoryFnodeMetadata {
+    content: DirectoryFnodeContent;
+}
+export declare type Fnode = RegularFileFnode | DirectoryFnode;
+export declare type RegularFileFnodeView = RegularFileFnodeContent;
+interface DirectoryFnodeViewItem {
+    name: string;
+    type: FnodeType;
+    btime: number;
+    rmtime: number;
+}
+export declare type DirectoryFnodeView = DirectoryFnodeViewItem[];
+export declare type FnodeView = RegularFileFnodeView | DirectoryFnodeView;
+declare global {
+    export interface BigInt {
+        toJSON(): string;
+    }
+}
+export {};

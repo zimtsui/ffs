@@ -1,32 +1,19 @@
 {
-  "name": "functionote-server",
+  "name": "ffs",
   "description": "",
   "version": "0.0.1",
   "main": "./build/app.js",
   "types": "./build/app.d.ts",
   "dependencies": {
-    "@koa/cors": "^3.1.0",
-    "@koa/router": "^10.1.1",
     "@types/better-sqlite3": "^7.4.1",
-    "@types/koa": "^2.13.4",
-    "@types/koa__cors": "^3.0.3",
-    "@types/koa__router": "^8.0.9",
-    "@types/koa-passport": "^4.0.3",
-    "@types/koa-session": "^5.10.4",
     "@types/lodash": "^4.14.177",
     "@types/node": "^16.11.7",
-    "@types/passport-http": "^0.3.9",
     "better-sqlite3": "^7.4.4",
-    "koa": "^2.13.4",
-    "koa-passport": "^4.1.4",
-    "koa-session": "^6.2.0",
-    "lodash": "^4.17.21",
-    "passport-http": "^0.3.0"
+    "lodash": "^4.17.21"
   },
   "scripts": {
     "build": "tsc -b ./src/tsconfig.json",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --enable-source-maps ./build/script.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Zim"
 }
