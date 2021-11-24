@@ -19,8 +19,8 @@ class PhysicalModel {
     makeFnodeMetadata(type, rmtime, mtime, modifiedFromId) {
         this.db.prepare(`
             INSERT INTO fnodes_metadata
-            (type, rmtime, mtime, previous_version_id, first_version_id)
-            VALUES (?, ?, ?, ?, 0)
+            (type, rmtime, mtime, previous_version_id)
+            VALUES (?, ?, ?, ?)
         ;`).run(type, rmtime, mtime, modifiedFromId !== undefined ? modifiedFromId : null);
         const id = this.getFnodeMetadataLastInsertRowid();
         this.db.prepare(`
@@ -65,7 +65,11 @@ class PhysicalModel {
             WHERE id = ?
         ;`).get(id);
         assert(row, new exceptions_1.FileNotFound());
-        return row;
+        assert(typeof row.firstVersionId === 'number');
+        return {
+            ...row,
+            firstVersionId: row.firstVersionId,
+        };
     }
     getDirectoryFnodeContentItemByName(parentId, childName) {
         const row = this.db.prepare(`

@@ -35,8 +35,8 @@ export abstract class PhysicalModel {
     ): FnodeId {
         this.db.prepare(`
             INSERT INTO fnodes_metadata
-            (type, rmtime, mtime, previous_version_id, first_version_id)
-            VALUES (?, ?, ?, ?, 0)
+            (type, rmtime, mtime, previous_version_id)
+            VALUES (?, ?, ?, ?)
         ;`).run(
             type,
             rmtime,
@@ -106,7 +106,7 @@ export abstract class PhysicalModel {
             mtime: number,
             rmtime: number,
             previousVersionId: number,
-            firstVersionId: number,
+            firstVersionId: number | null,
         } | undefined>this.db.prepare(`
             SELECT
                 id,
@@ -119,7 +119,11 @@ export abstract class PhysicalModel {
             WHERE id = ?
         ;`).get(id);
         assert(row, new FileNotFound());
-        return row;
+        assert(typeof row.firstVersionId === 'number');
+        return {
+            ...row,
+            firstVersionId: row.firstVersionId,
+        };
     }
 
     protected getDirectoryFnodeContentItemByName(
