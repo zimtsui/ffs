@@ -10,7 +10,7 @@ class PhysicalModel {
     getFnodeMetadataLastInsertRowid() {
         const row = this.db.prepare(`
             SELECT last_insert_rowid()
-            FROM fnode_metadata
+            FROM fnodes_metadata
         ;`).safeIntegers().get();
         assert(row);
         assert(row.id <= Number.MAX_SAFE_INTEGER);
@@ -18,13 +18,13 @@ class PhysicalModel {
     }
     makeFnodeMetadata(type, rmtime, mtime, modifiedFromId) {
         this.db.prepare(`
-            INSERT INTO fnode_metadata
+            INSERT INTO fnodes_metadata
             (type, rmtime, mtime, previous_version_id)
             VALUES (?, ?, ?, ?, 0)
         ;`).run(type, rmtime, mtime, modifiedFromId !== undefined ? modifiedFromId : null);
         const id = this.getFnodeMetadataLastInsertRowid();
         this.db.prepare(`
-            UPDATE fnode_metadata SET
+            UPDATE fnodes_metadata SET
                 first_version_id = ?
             WHERE id = ?
         ;`).run(modifiedFromId !== undefined
@@ -61,7 +61,7 @@ class PhysicalModel {
                 rmtime,
                 previous_version_id AS previousVersionId,
                 first_version_id AS firstVersionId
-            FROM fnode_metadata
+            FROM fnodes_metadata
             WHERE id = ?
         ;`).get(id);
         assert(row, new exceptions_1.FileNotFound());
@@ -126,7 +126,7 @@ class PhysicalModel {
             previous_version_id AS previousVersionId,
             first_version_id AS firstVersionId,
             content
-        FROM fnode_metadata, regular_file_fnodes_contents
+        FROM fnodes_metadata, regular_file_fnodes_contents
         WHERE id = ?
     ;`).get(id);
         assert(row, new exceptions_1.FileNotFound());
@@ -142,7 +142,7 @@ class PhysicalModel {
                 type,
                 rmtime,
                 btime
-            FROM directory_fnodes_contents, fnode_metadata
+            FROM directory_fnodes_contents, fnodes_metadata
             WHERE parent_id = ? AND child_id = id
         ;`).all(id);
         return rows;
