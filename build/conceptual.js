@@ -19,15 +19,15 @@ class ConceptualModel extends physical_1.PhysicalModel {
         }
     }
     getFnodeView(rootId, pathIter) {
-        const fileId = this.getFnodeIdByPath(rootId, pathIter);
+        const fnodeId = this.getFnodeIdByPath(rootId, pathIter);
         try {
-            const content = this.getRegularFileFnodeView(fileId);
+            const content = this.getRegularFileFnodeView(fnodeId);
             return content;
         }
         catch (err) {
             if (!(err instanceof exceptions_1.ExternalError))
                 throw err;
-            const content = this.getDirectoryFnodeViewUnsafe(fileId);
+            const content = this.getDirectoryFnodeViewUnsafe(fnodeId);
             return content;
         }
     }
@@ -66,12 +66,12 @@ class ConceptualModel extends physical_1.PhysicalModel {
         }
     }
     makeEmptyDirectory(rootId, pathIter, fileName, birthTime) {
-        const fileId = this.makeDirectoryFnode(birthTime, birthTime, []);
-        return this.makeFileByFnodeId(rootId, pathIter, fileName, fileId, birthTime);
+        const fnodeId = this.makeDirectoryFnode(birthTime, birthTime, []);
+        return this.makeFileByFnodeId(rootId, pathIter, fileName, fnodeId, birthTime);
     }
     makeRegularFileByContent(rootId, dirPathIter, fileName, content, birthTime) {
-        const fileId = this.makeRegularFileFnode(birthTime, birthTime, content);
-        return this.makeFileByFnodeId(rootId, dirPathIter, fileName, fileId, birthTime);
+        const fnodeId = this.makeRegularFileFnode(birthTime, birthTime, content);
+        return this.makeFileByFnodeId(rootId, dirPathIter, fileName, fnodeId, birthTime);
     }
     removeFile(rootId, pathIter, deletionTime) {
         const iterResult = pathIter.next();

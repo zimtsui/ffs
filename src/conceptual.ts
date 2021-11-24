@@ -33,13 +33,13 @@ export class ConceptualModel extends PhysicalModel {
         rootId: FnodeId,
         pathIter: PathIterator,
     ): FnodeView {
-        const fileId = this.getFnodeIdByPath(rootId, pathIter);
+        const fnodeId = this.getFnodeIdByPath(rootId, pathIter);
         try {
-            const content = this.getRegularFileFnodeView(fileId);
+            const content = this.getRegularFileFnodeView(fnodeId);
             return content;
         } catch (err) {
             if (!(err instanceof ExternalError)) throw err;
-            const content = this.getDirectoryFnodeViewUnsafe(fileId);
+            const content = this.getDirectoryFnodeViewUnsafe(fnodeId);
             return content;
         }
     }
@@ -101,12 +101,12 @@ export class ConceptualModel extends PhysicalModel {
         fileName: string,
         birthTime: number,
     ): FnodeId {
-        const fileId = this.makeDirectoryFnode(
+        const fnodeId = this.makeDirectoryFnode(
             birthTime, birthTime, [],
         );
         return this.makeFileByFnodeId(
             rootId, pathIter,
-            fileName, fileId,
+            fileName, fnodeId,
             birthTime,
         );
     }
@@ -116,12 +116,12 @@ export class ConceptualModel extends PhysicalModel {
         fileName: string, content: RegularFileFnodeContent,
         birthTime: number,
     ): FnodeId {
-        const fileId = this.makeRegularFileFnode(
+        const fnodeId = this.makeRegularFileFnode(
             birthTime, birthTime, content,
         );
         return this.makeFileByFnodeId(
             rootId, dirPathIter,
-            fileName, fileId,
+            fileName, fnodeId,
             birthTime,
         );
     }
