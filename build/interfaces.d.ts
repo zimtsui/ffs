@@ -1,6 +1,6 @@
 /// <reference types="node" />
 export declare type FnodeType = '-' | 'd';
-export declare type FnodeId = bigint;
+export declare type FnodeId = number;
 export declare type PathIterator = Iterator<string>;
 interface FnodeGenericMetadata {
     id: FnodeId;
@@ -40,9 +40,4 @@ interface DirectoryFnodeViewItem {
 }
 export declare type DirectoryFnodeView = DirectoryFnodeViewItem[];
 export declare type FnodeView = RegularFileFnodeView | DirectoryFnodeView;
-declare global {
-    export interface BigInt {
-        toJSON(): string;
-    }
-}
 export {};

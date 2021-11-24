@@ -1,6 +1,6 @@
 // Fnode basic
 export type FnodeType = '-' | 'd';
-export type FnodeId = bigint;
+export type FnodeId = number;
 export type PathIterator = Iterator<string>;
 
 
@@ -52,12 +52,3 @@ interface DirectoryFnodeViewItem {
 }
 export type DirectoryFnodeView = DirectoryFnodeViewItem[];
 export type FnodeView = RegularFileFnodeView | DirectoryFnodeView;
-
-
-// bigint
-declare global {
-    export interface BigInt {
-        toJSON(): string;
-    }
-}
-BigInt.prototype.toJSON = function () { return this.toString() }

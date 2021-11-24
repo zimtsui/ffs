@@ -11,9 +11,10 @@ class PhysicalModel {
         const row = this.db.prepare(`
             SELECT last_insert_rowid()
             FROM fnode_metadata
-        ;`).get();
+        ;`).safeIntegers().get();
         assert(row);
-        return row.id;
+        assert(row.id <= Number.MAX_SAFE_INTEGER);
+        return Number(row.id);
     }
     makeFnodeMetadata(type, rmtime, mtime, modifiedFromId) {
         this.db.prepare(`
@@ -43,12 +44,11 @@ class PhysicalModel {
     makeDirectoryFnode(rmtime, mtime, content, modifiedFromId) {
         const id = this.makeFnodeMetadata('d', rmtime, mtime, modifiedFromId);
         for (const child of content) {
-            const stmt = this.db.prepare(`
+            this.db.prepare(`
                 INSERT INTO directory_fnodes_contents
                 (parent_id, child_id, child_name, btime)
                 VALUES (?, ?, ?, ?)
-            ;`);
-            stmt.run(id, child.id, child.name, child.btime);
+            ;`).run(id, child.id, child.name, child.btime);
         }
         return id;
     }
@@ -63,13 +63,9 @@ class PhysicalModel {
                 first_version_id AS firstVersionId
             FROM fnode_metadata
             WHERE id = ?
-        ;`).safeIntegers(true).get(id);
+        ;`).get(id);
         assert(row, new exceptions_1.FileNotFound());
-        return {
-            ...row,
-            mtime: Number(row.mtime),
-            rmtime: Number(row.rmtime),
-        };
+        return row;
     }
     getDirectoryFnodeContentItemByName(parentId, childName) {
         const row = this.db.prepare(`
@@ -78,12 +74,12 @@ class PhysicalModel {
                 btime
             FROM directory_fnodes_contents
             WHERE parent_id = ? AND child_name = ?
-        ;`).safeIntegers(true).get(parentId, childName);
+        ;`).get(parentId, childName);
         assert(row, new exceptions_1.FileNotFound());
         return {
             id: row.childId,
             name: childName,
-            btime: Number(row.btime),
+            btime: row.btime,
         };
     }
     /**
@@ -97,20 +93,19 @@ class PhysicalModel {
                 btime
             FROM directory_fnodes_contents
             WHERE parent_id = ?
-        ;`).safeIntegers(true).all(id);
+        ;`).all(id);
         return rows.map(row => ({
             id: row.childId,
             name: row.childName,
-            btime: Number(row.btime),
+            btime: row.btime,
         }));
     }
     getRegularFileFnodeContent(id) {
-        const stmt = this.db.prepare(`
+        const row = this.db.prepare(`
             SELECT content
             FROM regular_file_fnodes_contents
             WHERE id = ?
-        ;`);
-        const row = stmt.get(id);
+        ;`).get(id);
         assert(row, new exceptions_1.FileNotFound());
         return row.content;
     }
@@ -123,24 +118,21 @@ class PhysicalModel {
         };
     }
     getRegularFileFnode(id) {
-        const stmt = this.db.prepare(`
-            SELECT
-                type,
-                mtime,
-                rmtime,
-                previous_version_id AS previousVersionId,
-                first_version_id AS firstVersionId,
-                content
-            FROM fnode_metadata, regular_file_fnodes_contents
-            WHERE id = ?
-        ;`).safeIntegers(true);
-        const row = stmt.get(id);
+        const row = this.db.prepare(`
+        SELECT
+            type,
+            mtime,
+            rmtime,
+            previous_version_id AS previousVersionId,
+            first_version_id AS firstVersionId,
+            content
+        FROM fnode_metadata, regular_file_fnodes_contents
+        WHERE id = ?
+    ;`).get(id);
         assert(row, new exceptions_1.FileNotFound());
         return {
             id,
             ...row,
-            mtime: Number(row.mtime),
-            rmtime: Number(row.rmtime),
         };
     }
     getDirectoryFnodeViewUnsafe(id) {

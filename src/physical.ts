@@ -15,15 +15,16 @@ import {
 export abstract class PhysicalModel {
     constructor(protected db: Sqlite.Database) { }
 
-    private getFnodeMetadataLastInsertRowid(): bigint {
+    private getFnodeMetadataLastInsertRowid(): number {
         const row = <{
             id: bigint;
         } | undefined>this.db.prepare(`
             SELECT last_insert_rowid()
             FROM fnode_metadata
-        ;`).get();
+        ;`).safeIntegers().get();
         assert(row);
-        return row.id;
+        assert(row.id <= Number.MAX_SAFE_INTEGER);
+        return Number(row.id);
     }
 
     private makeFnodeMetadata(
@@ -89,24 +90,23 @@ export abstract class PhysicalModel {
             modifiedFromId,
         );
         for (const child of content) {
-            const stmt = this.db.prepare(`
+            this.db.prepare(`
                 INSERT INTO directory_fnodes_contents
                 (parent_id, child_id, child_name, btime)
                 VALUES (?, ?, ?, ?)
-            ;`);
-            stmt.run(id, child.id, child.name, child.btime);
+            ;`).run(id, child.id, child.name, child.btime);
         }
         return id;
     }
 
     protected getFnodeMetadata(id: FnodeId): FnodeMetadata {
         const row = <{
-            id: bigint;
+            id: number;
             type: '-' | 'd',
-            mtime: bigint,
-            rmtime: bigint,
-            previousVersionId: bigint,
-            firstVersionId: bigint,
+            mtime: number,
+            rmtime: number,
+            previousVersionId: number,
+            firstVersionId: number,
         } | undefined>this.db.prepare(`
             SELECT
                 id,
@@ -117,13 +117,9 @@ export abstract class PhysicalModel {
                 first_version_id AS firstVersionId
             FROM fnode_metadata
             WHERE id = ?
-        ;`).safeIntegers(true).get(id);
+        ;`).get(id);
         assert(row, new FileNotFound());
-        return {
-            ...row,
-            mtime: Number(row.mtime),
-            rmtime: Number(row.rmtime),
-        };
+        return row;
     }
 
     protected getDirectoryFnodeContentItemByName(
@@ -131,20 +127,20 @@ export abstract class PhysicalModel {
         childName: string,
     ): DirectoryFnodeContentItem {
         const row = <{
-            childId: bigint;
-            btime: bigint;
+            childId: number;
+            btime: number;
         } | undefined>this.db.prepare(`
             SELECT
                 child_id AS childId,
                 btime
             FROM directory_fnodes_contents
             WHERE parent_id = ? AND child_name = ?
-        ;`).safeIntegers(true).get(parentId, childName);
+        ;`).get(parentId, childName);
         assert(row, new FileNotFound());
         return {
             id: row.childId,
             name: childName,
-            btime: Number(row.btime),
+            btime: row.btime,
         };
     }
 
@@ -153,9 +149,9 @@ export abstract class PhysicalModel {
      */
     protected getDirectoryFnodeContentUnsafe(id: FnodeId): DirectoryFnodeContent {
         const rows = <{
-            childId: bigint,
+            childId: number,
             childName: string,
-            btime: bigint,
+            btime: number,
         }[]>this.db.prepare(`
             SELECT
                 child_id AS childId,
@@ -163,21 +159,22 @@ export abstract class PhysicalModel {
                 btime
             FROM directory_fnodes_contents
             WHERE parent_id = ?
-        ;`).safeIntegers(true).all(id);
+        ;`).all(id);
         return rows.map(row => ({
             id: row.childId,
             name: row.childName,
-            btime: Number(row.btime),
+            btime: row.btime,
         }));
     }
 
     protected getRegularFileFnodeContent(id: FnodeId): RegularFileFnodeContent {
-        const stmt = this.db.prepare(`
+        const row = <{
+            content: Buffer
+        } | undefined>this.db.prepare(`
             SELECT content
             FROM regular_file_fnodes_contents
             WHERE id = ?
-        ;`);
-        const row = <{ content: Buffer } | undefined>stmt.get(id);
+        ;`).get(id);
         assert(row, new FileNotFound());
         return row.content;
     }
@@ -192,31 +189,28 @@ export abstract class PhysicalModel {
     }
 
     protected getRegularFileFnode(id: FnodeId): RegularFileFnode {
-        const stmt = this.db.prepare(`
-            SELECT
-                type,
-                mtime,
-                rmtime,
-                previous_version_id AS previousVersionId,
-                first_version_id AS firstVersionId,
-                content
-            FROM fnode_metadata, regular_file_fnodes_contents
-            WHERE id = ?
-        ;`).safeIntegers(true);
         const row = <{
             type: '-';
-            mtime: bigint;
-            rmtime: bigint;
-            previousVersionId: bigint;
-            firstVersionId: bigint;
+            mtime: number;
+            rmtime: number;
+            previousVersionId: number;
+            firstVersionId: number;
             content: Buffer;
-        } | undefined>stmt.get(id);
+        } | undefined>this.db.prepare(`
+        SELECT
+            type,
+            mtime,
+            rmtime,
+            previous_version_id AS previousVersionId,
+            first_version_id AS firstVersionId,
+            content
+        FROM fnode_metadata, regular_file_fnodes_contents
+        WHERE id = ?
+    ;`).get(id);
         assert(row, new FileNotFound());
         return {
             id,
             ...row,
-            mtime: Number(row.mtime),
-            rmtime: Number(row.rmtime),
         };
     }
 
