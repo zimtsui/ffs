@@ -22,6 +22,11 @@ class Applicable {
             return this.kernel.makeRegularFileByContent(rootId, dirPathIter, fileName, content, brithTime);
         })();
     }
+    makeEmptyDirectory(rootId, pathIter, fileName, brithTime) {
+        return this.db.transaction(() => {
+            return this.kernel.makeEmptyDirectory(rootId, pathIter, fileName, brithTime);
+        })();
+    }
     removeFile(rootId, pathIter, deletionTime) {
         return this.db.transaction(() => {
             return this.kernel.removeFile(rootId, pathIter, deletionTime);

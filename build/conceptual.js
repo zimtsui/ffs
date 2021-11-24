@@ -65,6 +65,10 @@ class ConceptualModel extends physical_1.PhysicalModel {
             return newParentId;
         }
     }
+    makeEmptyDirectory(rootId, pathIter, fileName, creationTime) {
+        const fileId = this.makeDirectoryFnode(creationTime, creationTime, []);
+        return this.makeFileByFnodeId(rootId, pathIter, fileName, fileId, creationTime);
+    }
     makeRegularFileByContent(rootId, dirPathIter, fileName, content, creationTime) {
         const fileId = this.makeRegularFileFnode(creationTime, creationTime, content);
         return this.makeFileByFnodeId(rootId, dirPathIter, fileName, fileId, creationTime);

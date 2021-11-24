@@ -51,6 +51,20 @@ export class Applicable {
         })();
     }
 
+    public makeEmptyDirectory(
+        rootId: FnodeId, pathIter: PathIterator,
+        fileName: string,
+        brithTime: number,
+    ): FnodeId {
+        return this.db.transaction(() => {
+            return this.kernel.makeEmptyDirectory(
+                rootId, pathIter,
+                fileName,
+                brithTime,
+            );
+        })();
+    }
+
     public removeFile(
         rootId: FnodeId, pathIter: PathIterator,
         deletionTime: number,

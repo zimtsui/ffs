@@ -7,6 +7,7 @@ export declare class Applicable {
     getFileView(rootId: FnodeId, pathIter: PathIterator): FnodeView;
     makeFileByFnodeId(rootId: FnodeId, dirPathIter: PathIterator, fileName: string, newFileId: FnodeId, birthTime: number): FnodeId;
     makeRegularFileByContent(rootId: FnodeId, dirPathIter: PathIterator, fileName: string, content: RegularFileFnodeContent, brithTime: number): FnodeId;
+    makeEmptyDirectory(rootId: FnodeId, pathIter: PathIterator, fileName: string, brithTime: number): FnodeId;
     removeFile(rootId: FnodeId, pathIter: PathIterator, deletionTime: number): FnodeId | null;
     modifyRegularFileContent(rootId: FnodeId, pathIter: PathIterator, newFileContent: RegularFileFnodeContent, modificationTime: number): FnodeId;
 }

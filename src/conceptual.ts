@@ -96,6 +96,21 @@ export class ConceptualModel extends PhysicalModel {
         }
     }
 
+    public makeEmptyDirectory(
+        rootId: FnodeId, pathIter: PathIterator,
+        fileName: string,
+        creationTime: number,
+    ): FnodeId {
+        const fileId = this.makeDirectoryFnode(
+            creationTime, creationTime, [],
+        );
+        return this.makeFileByFnodeId(
+            rootId, pathIter,
+            fileName, fileId,
+            creationTime,
+        );
+    }
+
     public makeRegularFileByContent(
         rootId: FnodeId, dirPathIter: PathIterator,
         fileName: string, content: RegularFileFnodeContent,
