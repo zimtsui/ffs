@@ -35,7 +35,7 @@ export abstract class PhysicalModel {
     ): FnodeId {
         this.db.prepare(`
             INSERT INTO fnodes_metadata
-            (type, rmtime, mtime, previous_version_id)
+            (type, rmtime, mtime, previous_version_id, first_version_id)
             VALUES (?, ?, ?, ?, 0)
         ;`).run(
             type,
