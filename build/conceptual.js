@@ -31,7 +31,7 @@ class ConceptualModel extends physical_1.PhysicalModel {
             return content;
         }
     }
-    makeFileByFnodeId(rootId, dirPathIter, newFileName, newFileId, creationTime) {
+    makeFileByFnodeId(rootId, dirPathIter, newFileName, newFileId, birthTime) {
         const iterResult = dirPathIter.next();
         if (iterResult.done) {
             const parentId = rootId;
@@ -39,10 +39,10 @@ class ConceptualModel extends physical_1.PhysicalModel {
             const childItem = parentContent.find(child => child.name === newFileName);
             assert(childItem === undefined, new exceptions_1.FileAlreadyExists());
             const newChild = {
-                id: newFileId, name: newFileName, btime: creationTime,
+                id: newFileId, name: newFileName, btime: birthTime,
             };
             const newParentContent = _(parentContent).push(newChild).value();
-            const newParentId = this.makeDirectoryFnode(creationTime, creationTime, newParentContent, parentId);
+            const newParentId = this.makeDirectoryFnode(birthTime, birthTime, newParentContent, parentId);
             return newParentId;
         }
         else {
@@ -53,7 +53,7 @@ class ConceptualModel extends physical_1.PhysicalModel {
             const childItem = parentContent.find(child => child.name === childName);
             assert(childItem !== undefined, new exceptions_1.FileNotFound());
             const newChild = {
-                id: this.makeFileByFnodeId(childItem.id, dirPathIter, newFileName, newFileId, creationTime),
+                id: this.makeFileByFnodeId(childItem.id, dirPathIter, newFileName, newFileId, birthTime),
                 name: childItem.name,
                 btime: childItem.btime
             };
@@ -61,17 +61,17 @@ class ConceptualModel extends physical_1.PhysicalModel {
                 .without(childItem)
                 .push(newChild)
                 .value();
-            const newParentId = this.makeDirectoryFnode(creationTime, parentDirectory.mtime, newParentContent, parentId);
+            const newParentId = this.makeDirectoryFnode(birthTime, parentDirectory.mtime, newParentContent, parentId);
             return newParentId;
         }
     }
-    makeEmptyDirectory(rootId, pathIter, fileName, creationTime) {
-        const fileId = this.makeDirectoryFnode(creationTime, creationTime, []);
-        return this.makeFileByFnodeId(rootId, pathIter, fileName, fileId, creationTime);
+    makeEmptyDirectory(rootId, pathIter, fileName, birthTime) {
+        const fileId = this.makeDirectoryFnode(birthTime, birthTime, []);
+        return this.makeFileByFnodeId(rootId, pathIter, fileName, fileId, birthTime);
     }
-    makeRegularFileByContent(rootId, dirPathIter, fileName, content, creationTime) {
-        const fileId = this.makeRegularFileFnode(creationTime, creationTime, content);
-        return this.makeFileByFnodeId(rootId, dirPathIter, fileName, fileId, creationTime);
+    makeRegularFileByContent(rootId, dirPathIter, fileName, content, birthTime) {
+        const fileId = this.makeRegularFileFnode(birthTime, birthTime, content);
+        return this.makeFileByFnodeId(rootId, dirPathIter, fileName, fileId, birthTime);
     }
     removeFile(rootId, pathIter, deletionTime) {
         const iterResult = pathIter.next();
@@ -108,10 +108,10 @@ class ConceptualModel extends physical_1.PhysicalModel {
             }
         }
     }
-    modifyRegularFileContent(rootId, pathIter, newFileContent, updatingTime) {
+    modifyRegularFileContent(rootId, pathIter, newFileContent, modificationTime) {
         const iterResult = pathIter.next();
         if (iterResult.done) {
-            const newFileId = this.makeRegularFileFnode(updatingTime, updatingTime, newFileContent, rootId);
+            const newFileId = this.makeRegularFileFnode(modificationTime, modificationTime, newFileContent, rootId);
             return newFileId;
         }
         else {
@@ -122,7 +122,7 @@ class ConceptualModel extends physical_1.PhysicalModel {
             const child = parentContent.find(child => child.name === newChildName);
             assert(child !== undefined, new exceptions_1.FileNotFound());
             const newChild = {
-                id: this.modifyRegularFileContent(child.id, pathIter, newFileContent, updatingTime),
+                id: this.modifyRegularFileContent(child.id, pathIter, newFileContent, modificationTime),
                 name: child.name,
                 btime: child.btime,
             };
@@ -130,7 +130,7 @@ class ConceptualModel extends physical_1.PhysicalModel {
                 .without(child)
                 .push(newChild)
                 .value();
-            const newParentId = this.makeDirectoryFnode(updatingTime, parentMetadata.mtime, newParentContent, parentId);
+            const newParentId = this.makeDirectoryFnode(modificationTime, parentMetadata.mtime, newParentContent, parentId);
             return newParentId;
         }
     }

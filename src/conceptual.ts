@@ -47,7 +47,7 @@ export class ConceptualModel extends PhysicalModel {
     public makeFileByFnodeId(
         rootId: FnodeId, dirPathIter: PathIterator,
         newFileName: string, newFileId: FnodeId,
-        creationTime: number,
+        birthTime: number,
     ): FnodeId {
         const iterResult = dirPathIter.next();
         if (iterResult.done) {
@@ -58,11 +58,11 @@ export class ConceptualModel extends PhysicalModel {
             assert(childItem === undefined, new FileAlreadyExists());
 
             const newChild: DirectoryFnodeContentItem = {
-                id: newFileId, name: newFileName, btime: creationTime,
+                id: newFileId, name: newFileName, btime: birthTime,
             };
             const newParentContent = _(parentContent).push(newChild).value();
             const newParentId = this.makeDirectoryFnode(
-                creationTime, creationTime, newParentContent, parentId,
+                birthTime, birthTime, newParentContent, parentId,
             );
             return newParentId;
         } else {
@@ -78,7 +78,7 @@ export class ConceptualModel extends PhysicalModel {
                 id: this.makeFileByFnodeId(
                     childItem.id, dirPathIter,
                     newFileName, newFileId,
-                    creationTime,
+                    birthTime,
                 ),
                 name: childItem.name,
                 btime: childItem.btime
@@ -88,7 +88,7 @@ export class ConceptualModel extends PhysicalModel {
                 .push(newChild)
                 .value();
             const newParentId = this.makeDirectoryFnode(
-                creationTime,
+                birthTime,
                 parentDirectory.mtime,
                 newParentContent, parentId,
             );
@@ -99,30 +99,30 @@ export class ConceptualModel extends PhysicalModel {
     public makeEmptyDirectory(
         rootId: FnodeId, pathIter: PathIterator,
         fileName: string,
-        creationTime: number,
+        birthTime: number,
     ): FnodeId {
         const fileId = this.makeDirectoryFnode(
-            creationTime, creationTime, [],
+            birthTime, birthTime, [],
         );
         return this.makeFileByFnodeId(
             rootId, pathIter,
             fileName, fileId,
-            creationTime,
+            birthTime,
         );
     }
 
     public makeRegularFileByContent(
         rootId: FnodeId, dirPathIter: PathIterator,
         fileName: string, content: RegularFileFnodeContent,
-        creationTime: number,
+        birthTime: number,
     ): FnodeId {
         const fileId = this.makeRegularFileFnode(
-            creationTime, creationTime, content,
+            birthTime, birthTime, content,
         );
         return this.makeFileByFnodeId(
             rootId, dirPathIter,
             fileName, fileId,
-            creationTime,
+            birthTime,
         );
     }
 
@@ -174,12 +174,12 @@ export class ConceptualModel extends PhysicalModel {
     public modifyRegularFileContent(
         rootId: FnodeId, pathIter: PathIterator,
         newFileContent: RegularFileFnodeContent,
-        updatingTime: number,
+        modificationTime: number,
     ): FnodeId {
         const iterResult = pathIter.next();
         if (iterResult.done) {
             const newFileId = this.makeRegularFileFnode(
-                updatingTime, updatingTime,
+                modificationTime, modificationTime,
                 newFileContent, rootId,
             );
             return newFileId;
@@ -195,7 +195,7 @@ export class ConceptualModel extends PhysicalModel {
             assert(child !== undefined, new FileNotFound());
 
             const newChild: DirectoryFnodeContentItem = {
-                id: this.modifyRegularFileContent(child.id, pathIter, newFileContent, updatingTime),
+                id: this.modifyRegularFileContent(child.id, pathIter, newFileContent, modificationTime),
                 name: child.name,
                 btime: child.btime,
             }
@@ -204,7 +204,7 @@ export class ConceptualModel extends PhysicalModel {
                 .push(newChild)
                 .value();
             const newParentId = this.makeDirectoryFnode(
-                updatingTime, parentMetadata.mtime,
+                modificationTime, parentMetadata.mtime,
                 newParentContent, parentId,
             );
             return newParentId;
