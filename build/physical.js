@@ -9,7 +9,7 @@ class PhysicalModel {
     }
     getFnodeMetadataLastInsertRowid() {
         const row = this.db.prepare(`
-            SELECT last_insert_rowid()
+            SELECT last_insert_rowid() AS id
             FROM fnodes_metadata
         ;`).safeIntegers().get();
         assert(row);
